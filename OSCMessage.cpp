@@ -380,6 +380,9 @@ OSCErrorCode OSCMessage::getError(){
  =============================================================================*/
 
 void OSCMessage::send(Print &p){
+    uint8_t * outgoingBuffer = NULL;
+    int outgoingBufferSize = 0;
+
     //don't send a message with errors
     if (hasError()){
         return;
@@ -390,13 +393,24 @@ void OSCMessage::send(Print &p){
     //padding amount
     int addrPad = padSize(addrLen);
     //write it to the stream
-    p.write((uint8_t *) address, addrLen);
+    //outgoingBuffer = (uint8_t *) realloc ( outgoingBuffer, outgoingBufferSize );
+    outgoingBufferSize = addrlen;
+    outgoingBuffer = (uint8_t *) malloc (addrLen);
+    memcpy(outgoingBuffer, (uint8_t *) address, outgoingBufferSize);
+    //p.write((uint8_t *) address, addrLen);
     //add the padding
     while(addrPad--){
-        p.write(nullChar);
+        outgoingBufferSize++;
+        outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+        //p.write(nullChar);
+        memcpy(outgoingBuffer, nullChar, outgoingBufferSize);
     }
     //add the comma seperator
-    p.write((uint8_t) ',');
+    uint8_t comma = ',';
+    outgoingBufferSize++;
+    outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+    memcpy(outgoingBuffer, (uint8_t *) ",", outgoingBufferSize);
+    //p.write((uint8_t) ',');
     //add the types
 #ifdef PAULSSUGGESTION
     // Paul suggested buffering on the stack
@@ -411,8 +425,12 @@ void OSCMessage::send(Print &p){
         p.write(typstr,dataCount);
     }
 #else
+    outgoingBufferSize += dataCount;
+    outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
     for (int i = 0; i < dataCount; i++){
-        p.write((uint8_t) getType(i));
+        // But is this just one character each time?
+        memcpy(outgoingBuffer, (uint8_t *) getType(i), outgoingBufferSize);
+        //p.write((uint8_t) getType(i));
     }
 #endif
     //pad the types
@@ -421,40 +439,65 @@ void OSCMessage::send(Print &p){
             typePad = 4;  // This is because the type string has to be null terminated
     }
     while(typePad--){
-        p.write(nullChar);
+        outgoingBufferSize++;
+        outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+        memcpy(outgoingBuffer, nullChar, outgoingBufferSize);
+        //p.write(nullChar);
     }
     //write the data
     for (int i = 0; i < dataCount; i++){
         OSCData * datum = getOSCData(i);
         if ((datum->type == 's') || (datum->type == 'b')){
-            p.write(datum->data.b, datum->bytes);
+            outgoingBufferSize += datum->bytes;
+            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+            memcpy(outgoingBuffer, (uint8_t) datum->data.b, outgoingBufferSize);
+            //p.write(datum->data.b, datum->bytes);
             int dataPad = padSize(datum->bytes);
             while(dataPad--){
-                p.write(nullChar);
+                outgoingBufferSize++;
+                outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+                memcpy(outgoingBuffer, nullChar, outgoingBufferSize);
+                //p.write(nullChar);
             }
         } else if(datum->type == 'b'){
-            p.write(datum->data.b, datum->bytes);
+            outgoingBufferSize += datum->bytes;
+            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+            memcpy(outgoingBuffer, (uint8_t) datum->data.b, outgoingBufferSize);
+            //p.write(datum->data.b, datum->bytes);
             int dataPad = padSize(datum->bytes);
             while(dataPad--){
-                p.write(nullChar);
+                outgoingBufferSize++;
+                outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+                memcpy(outgoingBuffer, nullChar, outgoingBufferSize);
+                //p.write(nullChar);
             }
         } else if (datum->type == 'd'){
             double d = BigEndian(datum->data.d);
             uint8_t * ptr = (uint8_t *) &d;
-            p.write(ptr, 8);
+            outgoingBufferSize += 8;
+            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+            memcpy(outgoingBuffer, (uint8_t) ptr, outgoingBufferSize);
+            //p.write(ptr, 8);
         } else if (datum->type == 't'){
             uint64_t d = BigEndian(datum->data.l);
             uint8_t * ptr = (uint8_t *)    &d;
-            p.write(ptr, 8);
+            outgoingBufferSize += 8;
+            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+            memcpy(outgoingBuffer, (uint8_t) ptr, outgoingBufferSize);
+            //p.write(ptr, 8);
 
         } else if (datum->type == 'T' || datum->type == 'F')
                     { }
         else { // float or int
             uint32_t i = BigEndian(datum->data.i);
             uint8_t * ptr = (uint8_t *) &i;
-            p.write(ptr, datum->bytes);
+            outgoingBufferSize += datum->bytes;
+            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+            memcpy(outgoingBuffer, (uint8_t) ptr, outgoingBufferSize);
+            //p.write(ptr, datum->bytes);
         }
     }
+    p.write(outgoingBuffer, outgoingBufferSize);
 }
 
 /*=============================================================================

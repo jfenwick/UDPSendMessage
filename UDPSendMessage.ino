@@ -13,7 +13,7 @@
     Adrian Freed
  */
 
-//UDP Udp;
+UDP Udp;
 
 //the Arduino's IP
 //IPAddress ip(128, 32, 122, 252);
@@ -31,8 +31,10 @@ void setup() {
 
 void loop(){
   //the message wants an OSC address as first argument
-  OSCMessage msg("/analog/0");
-  msg.add((int32_t)analogRead(0));
+  //OSCMessage msg("/analog/0");
+  //msg.add((int32_t)analogRead(0));
+  OSCMessage msg("/foo");
+  //msg.add('barx');
   
   Udp.beginPacket(outIp, outPort);
   msg.send(Udp); // send the bytes to the SLIP stream
