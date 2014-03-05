@@ -435,38 +435,18 @@ void OSCMessage::send(Print &p){
     outgoingBufferSize++;
     outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
     memcpy(outgoingBuffer+outgoingBufferSizeBefore, &comma, outgoingBufferSize-outgoingBufferSizeBefore);
-    p.write(outgoingBuffer, outgoingBufferSize);
-
-/*
- 
     //p.write(outgoingBuffer, outgoingBufferSize);
-    //p.write((uint8_t) ',');
-    //add the types
 
-#ifdef PAULSSUGGESTION
-    // Paul suggested buffering on the stack
-    // to improve performance. The problem is this could exhaust the stack
-    // for long complex messages
-    {
-        uint8_t typstr[dataCount];
-    
-        for (int i = 0; i < dataCount; i++){
-            typstr[i] =  getType(i);
-        }
-        p.write(typstr,dataCount);
-    }
-#else
     outgoingBufferSizeBefore = outgoingBufferSize;
     outgoingBufferSize += dataCount;
     outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
     for (int i = 0; i < dataCount; i++){
-        // But is this just one character each time?
-        outgoingBuffer[outgoingBufferSize] = (uint8_t) getType(i);
-        //memcpy(outgoingBuffer, (uint8_t *) getType(i), outgoingBufferSize);
-        //p.write((uint8_t) getType(i));
+        char t = getType(i);
+        char * tptr = &t;
+        memcpy(outgoingBuffer+outgoingBufferSizeBefore, tptr, outgoingBufferSize * sizeof(uint8_t));
         outgoingBufferSizeBefore++;
     }
-#endif
+
     //pad the types
     int typePad = padSize(dataCount + 1); // 1 is for the comma
     if (typePad == 0){
@@ -476,11 +456,10 @@ void OSCMessage::send(Print &p){
         outgoingBufferSizeBefore = outgoingBufferSize;
         outgoingBufferSize++;
         outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize  * sizeof(uint8_t));
-        outgoingBuffer[outgoingBufferSizeBefore] = nullChar;
-        //memcpy(outgoingBuffer, (uint8_t *) nullChar, outgoingBufferSize);
-        //p.write(nullChar);
-        outgoingBufferSize++;
+        memcpy(outgoingBuffer+outgoingBufferSizeBefore, &nullChar, outgoingBufferSize-outgoingBufferSizeBefore);
     }
+    p.write(outgoingBuffer, outgoingBufferSize);
+/*
     //write the data
     for (int i = 0; i < dataCount; i++){
         OSCData * datum = getOSCData(i);
