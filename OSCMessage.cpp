@@ -458,8 +458,7 @@ void OSCMessage::send(Print &p){
         outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize  * sizeof(uint8_t));
         memcpy(outgoingBuffer+outgoingBufferSizeBefore, &nullChar, outgoingBufferSize-outgoingBufferSizeBefore);
     }
-    p.write(outgoingBuffer, outgoingBufferSize);
-/*
+
     //write the data
     for (int i = 0; i < dataCount; i++){
         OSCData * datum = getOSCData(i);
@@ -467,33 +466,27 @@ void OSCMessage::send(Print &p){
             outgoingBufferSizeBefore = outgoingBufferSize;
             outgoingBufferSize += datum->bytes;
             outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize  * sizeof(uint8_t));
-            outgoingBuffer[outgoingBufferSizeBefore] = (uint8_t) *datum->data.b;
-            //memcpy(outgoingBuffer, (uint8_t *) datum->data.b, outgoingBufferSize);
-            //p.write(datum->data.b, datum->bytes);
+            memcpy(outgoingBuffer+outgoingBufferSizeBefore, datum->data.b, outgoingBufferSize-outgoingBufferSizeBefore);
+            
             int dataPad = padSize(datum->bytes);
             while(dataPad--){
                 outgoingBufferSizeBefore = outgoingBufferSize;
                 outgoingBufferSize++;
                 outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
-                outgoingBuffer[outgoingBufferSizeBefore] = nullChar;
-                //memcpy(outgoingBuffer, (uint8_t *) nullChar, outgoingBufferSize);
-                //p.write(nullChar);
+                memcpy(outgoingBuffer+outgoingBufferSizeBefore, &nullChar, outgoingBufferSize-outgoingBufferSizeBefore);
             }
         } else if(datum->type == 'b'){
             outgoingBufferSizeBefore = outgoingBufferSize;
             outgoingBufferSize += datum->bytes;
             outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
-            outgoingBuffer[outgoingBufferSizeBefore] = (uint8_t) *datum->data.b;
-            //memcpy(outgoingBuffer, (uint8_t *) datum->data.b, outgoingBufferSize);
-            //p.write(datum->data.b, datum->bytes);
+            memcpy(outgoingBuffer+outgoingBufferSizeBefore, datum->data.b, outgoingBufferSize-outgoingBufferSizeBefore);
+
             int dataPad = padSize(datum->bytes);
             while(dataPad--){
                 outgoingBufferSizeBefore = outgoingBufferSize;
                 outgoingBufferSize++;
                 outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
-                outgoingBuffer[outgoingBufferSizeBefore] = nullChar;
-                //memcpy(outgoingBuffer, (uint8_t *) nullChar, outgoingBufferSize);
-                //p.write(nullChar);
+                memcpy(outgoingBuffer+outgoingBufferSizeBefore, &nullChar, outgoingBufferSize-outgoingBufferSizeBefore);
             }
         } else if (datum->type == 'd'){
             double d = BigEndian(datum->data.d);
@@ -501,34 +494,27 @@ void OSCMessage::send(Print &p){
             outgoingBufferSizeBefore = outgoingBufferSize;
             outgoingBufferSize += 8;
             outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
-            outgoingBuffer[outgoingBufferSizeBefore] = (uint8_t) *ptr;
-            //memcpy(outgoingBuffer, (uint8_t *) ptr, outgoingBufferSize);
-            //p.write(ptr, 8);
+            memcpy(outgoingBuffer+outgoingBufferSizeBefore, ptr, outgoingBufferSize-outgoingBufferSizeBefore);
         } else if (datum->type == 't'){
             uint64_t d = BigEndian(datum->data.l);
-            uint8_t * ptr = (uint8_t *)    &d;
+            uint8_t * ptr = (uint8_t *) &d;
             outgoingBufferSizeBefore = outgoingBufferSize;
             outgoingBufferSize += 8;
             outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
-            outgoingBuffer[outgoingBufferSizeBefore] = (uint8_t) *ptr;
-            //memcpy(outgoingBuffer, (uint8_t *) ptr, outgoingBufferSize);
-            //p.write(ptr, 8);
-
+            memcpy(outgoingBuffer+outgoingBufferSizeBefore, ptr, outgoingBufferSize-outgoingBufferSizeBefore);
         } else if (datum->type == 'T' || datum->type == 'F')
-                    { }
+            { }
         else { // float or int
             uint32_t i = BigEndian(datum->data.i);
             uint8_t * ptr = (uint8_t *) &i;
             outgoingBufferSizeBefore = outgoingBufferSize;
-            outgoingBufferSize += datum->bytes;
+            outgoingBufferSize += 8;
             outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
-            outgoingBuffer[outgoingBufferSizeBefore] = (uint8_t) *ptr;
-            //memcpy(outgoingBuffer, (uint8_t *) ptr, outgoingBufferSize);
-            //p.write(ptr, datum->bytes);
+            memcpy(outgoingBuffer+outgoingBufferSizeBefore, ptr, outgoingBufferSize-outgoingBufferSizeBefore);
         }
     }
+
     p.write(outgoingBuffer, outgoingBufferSize);
-*/
 }
 
 /*=============================================================================
