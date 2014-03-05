@@ -27,12 +27,12 @@
 #include "OSCMatch.h"
 
 /*=============================================================================
-	CONSTRUCTORS / DESTRUCTOR
+    CONSTRUCTORS / DESTRUCTOR
 =============================================================================*/
 
 //constructor with address
 OSCMessage::OSCMessage(const char * _address){
-	setupMessage();
+    setupMessage();
     setAddress(_address);
 }
 
@@ -47,18 +47,18 @@ OSCMessage::OSCMessage(){
 //for example OSCMessage msg("/address", "isf", 1, "two", 3.0);
 /*
 OSCMessage::OSCMessage(const char * _address, char * types, ... ){
-	setupMessage(_address);
+    setupMessage(_address);
 }
  */
 
 //sets up a new message
 void OSCMessage::setupMessage(){
-	address = NULL;
-	//setup the attributes
-	dataCount = 0;
-	error = OSC_OK;
-	//setup the space for data
-	data = NULL;
+    address = NULL;
+    //setup the attributes
+    dataCount = 0;
+    error = OSC_OK;
+    //setup the space for data
+    data = NULL;
     //setup for filling the message
     incomingBuffer = NULL;
     incomingBufferSize = 0;
@@ -70,9 +70,9 @@ void OSCMessage::setupMessage(){
 
 //DESTRUCTOR
 OSCMessage::~OSCMessage(){
-	//free everything that needs to be freed
+    //free everything that needs to be freed
     //free the address
-	free(address);
+    free(address);
     //free the data
     empty();
     //free the filling buffer
@@ -97,90 +97,90 @@ void OSCMessage::empty(){
 
 //COPY
 OSCMessage::OSCMessage(OSCMessage * msg){
-	//start with a message with the same address
+    //start with a message with the same address
     setupMessage();
     setAddress(msg->address);
-	//add each of the data to the other message
-	for (int i = 0; i < msg->dataCount; i++){
+    //add each of the data to the other message
+    for (int i = 0; i < msg->dataCount; i++){
         add(msg->data[i]);
-	}
+    }
 }
 
 /*=============================================================================
-	GETTING DATA
+    GETTING DATA
 =============================================================================*/
 
 OSCData * OSCMessage::getOSCData(int position){
-	if (position < dataCount){
-		OSCData * datum = data[position];
-		return datum;
-	} else {
-		error = INDEX_OUT_OF_BOUNDS;
+    if (position < dataCount){
+        OSCData * datum = data[position];
+        return datum;
+    } else {
+        error = INDEX_OUT_OF_BOUNDS;
         return NULL;
-	}
+    }
 }
 
 int32_t OSCMessage::getInt(int position){
-	OSCData * datum = getOSCData(position);
-	if (!hasError()){
-		return datum->getInt();
+    OSCData * datum = getOSCData(position);
+    if (!hasError()){
+        return datum->getInt();
     } else {
         return NULL;
     }
 }
 uint64_t OSCMessage::getTime(int position){
-	OSCData * datum = getOSCData(position);
-	if (!hasError()){
-		return datum->getTime();
+    OSCData * datum = getOSCData(position);
+    if (!hasError()){
+        return datum->getTime();
     } else {
         return NULL;
     }
 }
 float OSCMessage::getFloat(int position){
-	OSCData * datum = getOSCData(position);
-	if (!hasError()){
-		return datum->getFloat();
+    OSCData * datum = getOSCData(position);
+    if (!hasError()){
+        return datum->getFloat();
     } else {
         return NULL;
     }
 }
 
 double OSCMessage::getDouble(int position){
-	OSCData * datum = getOSCData(position);
-	if (!hasError()){
-		return datum->getDouble();
+    OSCData * datum = getOSCData(position);
+    if (!hasError()){
+        return datum->getDouble();
     } else {
         return NULL;
     }
 }
 
 int OSCMessage::getString(int position, char * buffer, int bufferSize){
-	OSCData * datum = getOSCData(position);
-	if (!hasError()){
+    OSCData * datum = getOSCData(position);
+    if (!hasError()){
         //the number of bytes to copy is the smaller between the buffer size and the datum's byte length
         int copyBytes = bufferSize < datum->bytes? bufferSize : datum->bytes;
-		return datum->getString(buffer, copyBytes);
+        return datum->getString(buffer, copyBytes);
     } else {
         return NULL;
     }
 }
 
 int OSCMessage::getBlob(int position, uint8_t * buffer, int bufferSize){
-	OSCData * datum = getOSCData(position);
-	if (!hasError()){
+    OSCData * datum = getOSCData(position);
+    if (!hasError()){
         //the number of bytes to copy is the smaller between the buffer size and the datum's byte length
         int copyBytes = bufferSize < datum->bytes? bufferSize : datum->bytes;
-		return datum->getBlob(buffer, copyBytes);
+        return datum->getBlob(buffer, copyBytes);
     } else {
         return NULL;
     }
 }
 
 char OSCMessage::getType(int position){
-	OSCData * datum = getOSCData(position);
-	if (!hasError()){
-		return datum->type;
-	} else {
+    OSCData * datum = getOSCData(position);
+    if (!hasError()){
+        return datum->type;
+    } else {
         return NULL;
     }
 }
@@ -195,93 +195,93 @@ int OSCMessage::getDataLength(int position){
 }
 
 /*=============================================================================
-	TESTING DATA
+    TESTING DATA
 =============================================================================*/
 
 bool OSCMessage::testType(int position, char type){
-	OSCData * datum = getOSCData(position);
-	if (!hasError()){
-		return datum->type == type;
-	} else {
-		return false;
-	}
+    OSCData * datum = getOSCData(position);
+    if (!hasError()){
+        return datum->type == type;
+    } else {
+        return false;
+    }
 }
 
 bool OSCMessage::isInt(int position){
-	return testType(position, 'i');
+    return testType(position, 'i');
 }
 
 bool OSCMessage::isTime(int position){
-	return testType(position, 't');
+    return testType(position, 't');
 }
 
 
 bool OSCMessage::isFloat(int position){
-	return testType(position, 'f');
+    return testType(position, 'f');
 }
 
 bool OSCMessage::isBlob(int position){
-	return testType(position, 'b');
+    return testType(position, 'b');
 }
 
 bool OSCMessage::isChar(int position){
-	return testType(position, 'c');
+    return testType(position, 'c');
 }
 
 bool OSCMessage::isString(int position){
-	return testType(position, 's');
+    return testType(position, 's');
 }
 
 bool OSCMessage::isDouble(int position){
-	return testType(position, 'd');
+    return testType(position, 'd');
 }
 bool OSCMessage::isBoolean(int position){
-	return testType(position, 'T') || testType(position, 'F');
+    return testType(position, 'T') || testType(position, 'F');
 }
 
 
 /*=============================================================================
-	PATTERN MATCHING
+    PATTERN MATCHING
 =============================================================================*/
 
 int OSCMessage::match(const  char * pattern, int addr_offset){
-	int pattern_offset;
-	int address_offset;
-	int ret = osc_match(address + addr_offset, pattern, &pattern_offset, &address_offset);
-	char * next = (char *) (address + addr_offset + pattern_offset);
-	if (ret==3){
-		return pattern_offset;
-	} else if (pattern_offset > 0 && *next == '/'){
-		return pattern_offset;
-	} else {
-		return 0;
-	}
+    int pattern_offset;
+    int address_offset;
+    int ret = osc_match(address + addr_offset, pattern, &pattern_offset, &address_offset);
+    char * next = (char *) (address + addr_offset + pattern_offset);
+    if (ret==3){
+        return pattern_offset;
+    } else if (pattern_offset > 0 && *next == '/'){
+        return pattern_offset;
+    } else {
+        return 0;
+    }
 }
 
 bool OSCMessage::fullMatch( const char * pattern, int addr_offset){
-	int pattern_offset;
-	int address_offset;
-	int ret = osc_match(address + addr_offset, pattern, &address_offset, &pattern_offset);
-	return (ret==3);
+    int pattern_offset;
+    int address_offset;
+    int ret = osc_match(address + addr_offset, pattern, &address_offset, &pattern_offset);
+    return (ret==3);
 }
 
 bool OSCMessage::dispatch(const char * pattern, void (*callback)(OSCMessage &), int addr_offset){
-	if (fullMatch(pattern, addr_offset)){
-		callback(*this);
-		return true;
-	} else {
-		return false;
-	}
+    if (fullMatch(pattern, addr_offset)){
+        callback(*this);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool OSCMessage::route(const char * pattern, void (*callback)(OSCMessage &, int), int initial_offset){
-	int match_offset = match(pattern, initial_offset);
-	if (match_offset>0){
-		callback(*this, match_offset + initial_offset);
-		return true;
-	} else {
-		return false;
-	}
+    int match_offset = match(pattern, initial_offset);
+    if (match_offset>0){
+        callback(*this, match_offset + initial_offset);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /*=============================================================================
@@ -290,44 +290,44 @@ bool OSCMessage::route(const char * pattern, void (*callback)(OSCMessage &, int)
 
 int OSCMessage::getAddress(char * buffer, int offset){
     strcpy(buffer, address+offset);
-	return strlen(buffer);
+    return strlen(buffer);
 }
 
 int OSCMessage::getAddress(char * buffer, int offset, int len){
     strncpy(buffer, address+offset, len);
-	return strlen(buffer);
+    return strlen(buffer);
 }
 
 void OSCMessage::setAddress(const char * _address){
     //free the previous address
     free(address); // are we sure address was allocated?
     //copy the address
-	char * addressMemory = (char *) malloc( (strlen(_address) + 1) * sizeof(char) );
-	if (addressMemory == NULL){
-		error = ALLOCFAILED;
-		address = NULL;
-	} else {
-		strcpy(addressMemory, _address);
-		address = addressMemory;
-	}
+    char * addressMemory = (char *) malloc( (strlen(_address) + 1) * sizeof(char) );
+    if (addressMemory == NULL){
+        error = ALLOCFAILED;
+        address = NULL;
+    } else {
+        strcpy(addressMemory, _address);
+        address = addressMemory;
+    }
 }
 
 /*=============================================================================
-	SIZE
+    SIZE
 =============================================================================*/
 
 #ifdef SLOWpadcalculation
 int OSCMessage::padSize(int _bytes){
     int space = (_bytes + 3) / 4;
     space *= 4;
-	return space - _bytes;
+    return space - _bytes;
 }
 #else
 static inline  int padSize(int bytes) { return (4- (bytes&03))&3; }
 #endif
 //returns the number of OSCData in the OSCMessage
 int OSCMessage::size(){
-	return dataCount;
+    return dataCount;
 }
 
 int OSCMessage::bytes(){
@@ -358,7 +358,7 @@ int OSCMessage::bytes(){
 }
 
 /*=============================================================================
-	ERROR HANDLING
+    ERROR HANDLING
 =============================================================================*/
 
 bool OSCMessage::hasError(){
@@ -368,7 +368,7 @@ bool OSCMessage::hasError(){
         OSCData * datum = getOSCData(i);
         retError |= datum->error != OSC_OK;
     }
-	return retError;
+    return retError;
 }
 
 OSCErrorCode OSCMessage::getError(){
@@ -380,7 +380,9 @@ OSCErrorCode OSCMessage::getError(){
  =============================================================================*/
 
 void OSCMessage::send(Print &p){
+//void OSCMessage::send(UDP p){
     uint8_t * outgoingBuffer = NULL;
+    int outgoingBufferSizeBefore = 0;
     int outgoingBufferSize = 0;
 
     //don't send a message with errors
@@ -394,22 +396,27 @@ void OSCMessage::send(Print &p){
     int addrPad = padSize(addrLen);
     //write it to the stream
     //outgoingBuffer = (uint8_t *) realloc ( outgoingBuffer, outgoingBufferSize );
-    outgoingBufferSize = addrlen;
-    outgoingBuffer = (uint8_t *) malloc (addrLen);
-    memcpy(outgoingBuffer, (uint8_t *) address, outgoingBufferSize);
+    outgoingBufferSize = addrLen;
+    outgoingBuffer = (uint8_t *) malloc (addrLen * sizeof(uint8_t));
+    outgoingBuffer[0] = (uint8_t) *address;
+    //memcpy(outgoingBuffer, (uint8_t *) address, outgoingBufferSize);
     //p.write((uint8_t *) address, addrLen);
     //add the padding
     while(addrPad--){
+        outgoingBufferSizeBefore = outgoingBufferSize;
         outgoingBufferSize++;
-        outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+        outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
         //p.write(nullChar);
-        memcpy(outgoingBuffer, nullChar, outgoingBufferSize);
+        //memcpy(outgoingBuffer, (uint8_t *) nullChar, outgoingBufferSize);
+        outgoingBuffer[outgoingBufferSizeBefore] = nullChar; 
     }
     //add the comma seperator
     uint8_t comma = ',';
+    outgoingBufferSizeBefore = outgoingBufferSize;
     outgoingBufferSize++;
-    outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
-    memcpy(outgoingBuffer, (uint8_t *) ",", outgoingBufferSize);
+    outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
+    outgoingBuffer[outgoingBufferSizeBefore] = comma;
+    //memcpy(outgoingBuffer, (uint8_t *) ",", outgoingBufferSize);
     //p.write((uint8_t) ',');
     //add the types
 #ifdef PAULSSUGGESTION
@@ -425,12 +432,15 @@ void OSCMessage::send(Print &p){
         p.write(typstr,dataCount);
     }
 #else
+    outgoingBufferSizeBefore = outgoingBufferSize;
     outgoingBufferSize += dataCount;
-    outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
+    outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
     for (int i = 0; i < dataCount; i++){
         // But is this just one character each time?
-        memcpy(outgoingBuffer, (uint8_t *) getType(i), outgoingBufferSize);
+        outgoingBuffer[outgoingBufferSize] = (uint8_t) getType(i);
+        //memcpy(outgoingBuffer, (uint8_t *) getType(i), outgoingBufferSize);
         //p.write((uint8_t) getType(i));
+        outgoingBufferSizeBefore++;
     }
 #endif
     //pad the types
@@ -439,51 +449,66 @@ void OSCMessage::send(Print &p){
             typePad = 4;  // This is because the type string has to be null terminated
     }
     while(typePad--){
+        outgoingBufferSizeBefore = outgoingBufferSize;
         outgoingBufferSize++;
-        outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
-        memcpy(outgoingBuffer, nullChar, outgoingBufferSize);
+        outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize  * sizeof(uint8_t));
+        outgoingBuffer[outgoingBufferSizeBefore] = nullChar;
+        //memcpy(outgoingBuffer, (uint8_t *) nullChar, outgoingBufferSize);
         //p.write(nullChar);
+        outgoingBufferSize++;
     }
     //write the data
     for (int i = 0; i < dataCount; i++){
         OSCData * datum = getOSCData(i);
         if ((datum->type == 's') || (datum->type == 'b')){
+            outgoingBufferSizeBefore = outgoingBufferSize;
             outgoingBufferSize += datum->bytes;
-            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
-            memcpy(outgoingBuffer, (uint8_t) datum->data.b, outgoingBufferSize);
+            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize  * sizeof(uint8_t));
+            outgoingBuffer[outgoingBufferSizeBefore] = (uint8_t) *datum->data.b;
+            //memcpy(outgoingBuffer, (uint8_t *) datum->data.b, outgoingBufferSize);
             //p.write(datum->data.b, datum->bytes);
             int dataPad = padSize(datum->bytes);
             while(dataPad--){
+                outgoingBufferSizeBefore = outgoingBufferSize;
                 outgoingBufferSize++;
-                outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
-                memcpy(outgoingBuffer, nullChar, outgoingBufferSize);
+                outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
+                outgoingBuffer[outgoingBufferSizeBefore] = nullChar;
+                //memcpy(outgoingBuffer, (uint8_t *) nullChar, outgoingBufferSize);
                 //p.write(nullChar);
             }
         } else if(datum->type == 'b'){
+            outgoingBufferSizeBefore = outgoingBufferSize;
             outgoingBufferSize += datum->bytes;
-            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
-            memcpy(outgoingBuffer, (uint8_t) datum->data.b, outgoingBufferSize);
+            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
+            outgoingBuffer[outgoingBufferSizeBefore] = (uint8_t) *datum->data.b;
+            //memcpy(outgoingBuffer, (uint8_t *) datum->data.b, outgoingBufferSize);
             //p.write(datum->data.b, datum->bytes);
             int dataPad = padSize(datum->bytes);
             while(dataPad--){
+                outgoingBufferSizeBefore = outgoingBufferSize;
                 outgoingBufferSize++;
-                outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
-                memcpy(outgoingBuffer, nullChar, outgoingBufferSize);
+                outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
+                outgoingBuffer[outgoingBufferSizeBefore] = nullChar;
+                //memcpy(outgoingBuffer, (uint8_t *) nullChar, outgoingBufferSize);
                 //p.write(nullChar);
             }
         } else if (datum->type == 'd'){
             double d = BigEndian(datum->data.d);
             uint8_t * ptr = (uint8_t *) &d;
+            outgoingBufferSizeBefore = outgoingBufferSize;
             outgoingBufferSize += 8;
-            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
-            memcpy(outgoingBuffer, (uint8_t) ptr, outgoingBufferSize);
+            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
+            outgoingBuffer[outgoingBufferSizeBefore] = (uint8_t) *ptr;
+            //memcpy(outgoingBuffer, (uint8_t *) ptr, outgoingBufferSize);
             //p.write(ptr, 8);
         } else if (datum->type == 't'){
             uint64_t d = BigEndian(datum->data.l);
             uint8_t * ptr = (uint8_t *)    &d;
+            outgoingBufferSizeBefore = outgoingBufferSize;
             outgoingBufferSize += 8;
-            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
-            memcpy(outgoingBuffer, (uint8_t) ptr, outgoingBufferSize);
+            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
+            outgoingBuffer[outgoingBufferSizeBefore] = (uint8_t) *ptr;
+            //memcpy(outgoingBuffer, (uint8_t *) ptr, outgoingBufferSize);
             //p.write(ptr, 8);
 
         } else if (datum->type == 'T' || datum->type == 'F')
@@ -491,9 +516,11 @@ void OSCMessage::send(Print &p){
         else { // float or int
             uint32_t i = BigEndian(datum->data.i);
             uint8_t * ptr = (uint8_t *) &i;
+            outgoingBufferSizeBefore = outgoingBufferSize;
             outgoingBufferSize += datum->bytes;
-            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize);
-            memcpy(outgoingBuffer, (uint8_t) ptr, outgoingBufferSize);
+            outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
+            outgoingBuffer[outgoingBufferSizeBefore] = (uint8_t) *ptr;
+            //memcpy(outgoingBuffer, (uint8_t *) ptr, outgoingBufferSize);
             //p.write(ptr, datum->bytes);
         }
     }
@@ -632,31 +659,31 @@ void OSCMessage::decode(uint8_t incomingByte){
             }
             break;
         case ADDRESS:
-			if (incomingByte == 0){
-				//end of the address
-				//decode the address
+            if (incomingByte == 0){
+                //end of the address
+                //decode the address
                 decodeAddress();
-				//next state
-				decodeState = ADDRESS_PADDING;
-			} 
-			break;
-		case ADDRESS_PADDING:
+                //next state
+                decodeState = ADDRESS_PADDING;
+            } 
+            break;
+        case ADDRESS_PADDING:
             //it does not count the padding
-			if (incomingByte==','){
-				//next state
-				decodeState = TYPES;
+            if (incomingByte==','){
+                //next state
+                decodeState = TYPES;
                 clearIncomingBuffer();
-			}
-			break;
-		case TYPES:
-			if (incomingByte != 0){
-				//next state
+            }
+            break;
+        case TYPES:
+            if (incomingByte != 0){
+                //next state
                 decodeType(incomingByte);
-			} else {
+            } else {
                 decodeState = TYPES_PADDING;
             }
             //FALL THROUGH to test if it should go to the data state
-		case TYPES_PADDING: {
+        case TYPES_PADDING: {
                 //compute the padding size for the types
                 //to determine the start of the data section
             int typePad = padSize(dataCount + 1); // 1 is the comma
@@ -668,11 +695,11 @@ void OSCMessage::decode(uint8_t incomingByte){
                     decodeState = DATA;
                 }
             }
-			break;
-		case DATA:
+            break;
+        case DATA:
             decodeData(incomingByte);
             break;
-		case DATA_PADDING:{
+        case DATA_PADDING:{
                 //get hte last valid data
                 for (int i = dataCount - 1; i >= 0; i--){
                     OSCData * datum = getOSCData(i);
@@ -687,7 +714,7 @@ void OSCMessage::decode(uint8_t incomingByte){
                     }
                 }
             }
-			break;
+            break;
 
     }
 }
@@ -705,7 +732,7 @@ void OSCMessage::addToIncomingBuffer(uint8_t incomingByte){
             incomingBufferFree--;
     }
     else
-	{
+    {
 
         incomingBuffer = (uint8_t *) realloc ( incomingBuffer, incomingBufferSize + 1 + OSCPREALLOCATEIZE);
         if (incomingBuffer != NULL){
@@ -719,12 +746,12 @@ void OSCMessage::addToIncomingBuffer(uint8_t incomingByte){
 
 void OSCMessage::clearIncomingBuffer(){
     incomingBuffer = (uint8_t *) realloc ( incomingBuffer, OSCPREALLOCATEIZE);
-	if (incomingBuffer != NULL){
-		incomingBufferFree = OSCPREALLOCATEIZE;
-	} else {
-		error = ALLOCFAILED;
+    if (incomingBuffer != NULL){
+        incomingBufferFree = OSCPREALLOCATEIZE;
+    } else {
+        error = ALLOCFAILED;
         incomingBuffer = NULL;
 
-	}    
+    }    
     incomingBufferSize = 0;
 }
