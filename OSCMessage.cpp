@@ -389,36 +389,68 @@ void OSCMessage::send(Print &p){
     if (hasError()){
         return;
     }
+
+    /*
     uint8_t nullChar = '\0';
+    uint8_t buf[32];
+    memcpy(buf,myFoo,strlen(myFoo)+1);
+    buf[5] = '\0';
+    buf[6] = '\0';
+    buf[7] = '\0';
+    buf[8] = ',';
+    buf[9] = '\0';
+    buf[10] = '\0';    
+    buf[11] = '\0';
+    p.write(buf,12););
+    */
+
+    uint8_t nullChar = '\0';
+
     //send the address
-    int addrLen = strlen(address) + 1;
+    //int addrLen = strlen(address) + 1;
+    int addrLen = strlen(address);
     //padding amount
     int addrPad = padSize(addrLen);
     //write it to the stream
     //outgoingBuffer = (uint8_t *) realloc ( outgoingBuffer, outgoingBufferSize );
     outgoingBufferSize = addrLen;
     outgoingBuffer = (uint8_t *) malloc (addrLen * sizeof(uint8_t));
-    outgoingBuffer[0] = (uint8_t) *address;
-    //memcpy(outgoingBuffer, (uint8_t *) address, outgoingBufferSize);
-    //p.write((uint8_t *) address, addrLen);
+    //outgoingBuffer[0] = (uint8_t) *address;
+    memcpy(outgoingBuffer, address, outgoingBufferSize);
+    p.write(outgoingBuffer, addrLen);
     //add the padding
+    
+    outgoingBufferSizeBefore = outgoingBufferSize;
+    outgoingBufferSize++;
+    outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
+    //p.write(nullChar);
+    memcpy(outgoingBuffer+outgoingBufferSizeBefore, &nullChar, outgoingBufferSize-outgoingBufferSizeBefore);
+    //outgoingBuffer[outgoingBufferSizeBefore] = nullChar; 
+    p.write(outgoingBuffer, outgoingBufferSize);
+    
+/*
     while(addrPad--){
         outgoingBufferSizeBefore = outgoingBufferSize;
         outgoingBufferSize++;
         outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
         //p.write(nullChar);
-        //memcpy(outgoingBuffer, (uint8_t *) nullChar, outgoingBufferSize);
-        outgoingBuffer[outgoingBufferSizeBefore] = nullChar; 
+        memcpy(outgoingBuffer+outgoingBufferSizeBefore, nullChar, outgoingBufferSize-outgoingBufferSizeBefore);
+        //outgoingBuffer[outgoingBufferSizeBefore] = nullChar; 
     }
+    p.write(outgoingBuffer, outgoingBufferSize);
+
+    
     //add the comma seperator
     uint8_t comma = ',';
     outgoingBufferSizeBefore = outgoingBufferSize;
     outgoingBufferSize++;
     outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
     outgoingBuffer[outgoingBufferSizeBefore] = comma;
-    //memcpy(outgoingBuffer, (uint8_t *) ",", outgoingBufferSize);
+    memcpy(outgoingBuffer, (uint8_t *) ",", outgoingBufferSize);
+    p.write(outgoingBuffer, outgoingBufferSize);
     //p.write((uint8_t) ',');
     //add the types
+
 #ifdef PAULSSUGGESTION
     // Paul suggested buffering on the stack
     // to improve performance. The problem is this could exhaust the stack
@@ -525,6 +557,7 @@ void OSCMessage::send(Print &p){
         }
     }
     p.write(outgoingBuffer, outgoingBufferSize);
+*/
 }
 
 /*=============================================================================
