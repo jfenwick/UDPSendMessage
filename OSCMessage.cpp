@@ -391,6 +391,7 @@ void OSCMessage::send(Print &p){
     }
 
     /*
+    const char myFoo[] = "/foo";
     uint8_t nullChar = '\0';
     uint8_t buf[32];
     memcpy(buf,myFoo,strlen(myFoo)+1);
@@ -405,6 +406,7 @@ void OSCMessage::send(Print &p){
     */
 
     uint8_t nullChar = '\0';
+    //uint8_t nullChar = 'a';
 
     //send the address
     //int addrLen = strlen(address) + 1;
@@ -417,37 +419,27 @@ void OSCMessage::send(Print &p){
     outgoingBuffer = (uint8_t *) malloc (addrLen * sizeof(uint8_t));
     //outgoingBuffer[0] = (uint8_t) *address;
     memcpy(outgoingBuffer, address, outgoingBufferSize);
-    p.write(outgoingBuffer, addrLen);
+    //p.write(outgoingBuffer, addrLen);
     //add the padding
     
-    outgoingBufferSizeBefore = outgoingBufferSize;
-    outgoingBufferSize++;
-    outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
-    //p.write(nullChar);
-    memcpy(outgoingBuffer+outgoingBufferSizeBefore, &nullChar, outgoingBufferSize-outgoingBufferSizeBefore);
-    //outgoingBuffer[outgoingBufferSizeBefore] = nullChar; 
-    p.write(outgoingBuffer, outgoingBufferSize);
-    
-/*
     while(addrPad--){
         outgoingBufferSizeBefore = outgoingBufferSize;
         outgoingBufferSize++;
         outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
-        //p.write(nullChar);
-        memcpy(outgoingBuffer+outgoingBufferSizeBefore, nullChar, outgoingBufferSize-outgoingBufferSizeBefore);
-        //outgoingBuffer[outgoingBufferSizeBefore] = nullChar; 
+        memcpy(outgoingBuffer+outgoingBufferSizeBefore, &nullChar, outgoingBufferSize-outgoingBufferSizeBefore);
     }
-    p.write(outgoingBuffer, outgoingBufferSize);
-
     
     //add the comma seperator
     uint8_t comma = ',';
     outgoingBufferSizeBefore = outgoingBufferSize;
     outgoingBufferSize++;
     outgoingBuffer = (uint8_t *) realloc (outgoingBuffer, outgoingBufferSize * sizeof(uint8_t));
-    outgoingBuffer[outgoingBufferSizeBefore] = comma;
-    memcpy(outgoingBuffer, (uint8_t *) ",", outgoingBufferSize);
+    memcpy(outgoingBuffer+outgoingBufferSizeBefore, &comma, outgoingBufferSize-outgoingBufferSizeBefore);
     p.write(outgoingBuffer, outgoingBufferSize);
+
+/*
+ 
+    //p.write(outgoingBuffer, outgoingBufferSize);
     //p.write((uint8_t) ',');
     //add the types
 
