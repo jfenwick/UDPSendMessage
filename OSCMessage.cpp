@@ -515,6 +515,7 @@ void OSCMessage::send(Print &p){
     }
 
     p.write(outgoingBuffer, outgoingBufferSize);
+    free(outgoingBuffer);
 }
 
 /*=============================================================================

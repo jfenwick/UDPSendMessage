@@ -33,13 +33,16 @@ void loop(){
   //the message wants an OSC address as first argument
   //OSCMessage msg("/analog/0");
   //msg.add((int32_t)analogRead(0));
-  OSCMessage msg("/foo");
-  //msg.add('barx');
-  
+  //OSCMessage msg("/fooi");
+  //const char * s = "barx";
+  //msg.add(s);
+  int x = 2;
+  msg.add(x);
+
   Udp.beginPacket(outIp, outPort);
   msg.send(Udp); // send the bytes to the SLIP stream
   Udp.endPacket(); // mark the end of the OSC Packet
   msg.empty(); // free space occupied by message
 
-  delay(20);
+  delay(1000);
 }
